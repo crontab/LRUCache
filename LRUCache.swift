@@ -7,7 +7,7 @@
 import Foundation
 
 
-struct LRUCache<K: Hashable, E>: Sequence {
+public struct LRUCache<K: Hashable, E>: Sequence {
 
 	private struct BubbleList {
 
@@ -98,20 +98,20 @@ struct LRUCache<K: Hashable, E>: Sequence {
 
 	private(set) var capacity: Int
 
-	var count: Int { list.count }
-	var isEmpty: Bool { list.isEmpty }
+	public var count: Int { list.count }
+	public var isEmpty: Bool { list.isEmpty }
 
 	private var list = BubbleList()
 	private var dict = Dictionary<K, BubbleList.Node>()
 
 
-	init(capacity: Int) {
+	public init(capacity: Int) {
 		precondition(capacity > 0)
 		self.capacity = capacity
 	}
 
 
-	mutating func set(_ element: E, forKey key: K) {
+	public mutating func set(_ element: E, forKey key: K) {
 		if let node = dict[key] {
 			node.value = element
 			list.moveToTop(node: node)
@@ -126,7 +126,7 @@ struct LRUCache<K: Hashable, E>: Sequence {
 	}
 
 
-	mutating func touch(key: K) -> E? {
+	public mutating func touch(key: K) -> E? {
 		if let node = dict[key] {
 			list.moveToTop(node: node)
 			return node.value
@@ -135,7 +135,7 @@ struct LRUCache<K: Hashable, E>: Sequence {
 	}
 
 
-	mutating func remove(key: K) {
+	public mutating func remove(key: K) {
 		if let node = dict[key] {
 			list.remove(node: node)
 			dict.removeValue(forKey: key)
@@ -143,7 +143,12 @@ struct LRUCache<K: Hashable, E>: Sequence {
 	}
 
 
-	mutating func removeAll() {
+	public func has(key: K) -> Bool {
+		dict[key] != nil
+	}
+
+
+	public mutating func removeAll() {
 		list.removeAll()
 		dict.removeAll()
 	}
@@ -151,22 +156,22 @@ struct LRUCache<K: Hashable, E>: Sequence {
 
 	// MARK: - iterator/sequence
 
-	struct Iterator: IteratorProtocol {
-		typealias Element = E
+	public struct Iterator: IteratorProtocol {
+		public typealias Element = E
 		private var currentNode: BubbleList.Node?
 
 		init(iteree: LRUCache) {
 			currentNode = iteree.list.top
 		}
 
-		mutating func next() -> E? {
+		public mutating func next() -> E? {
 			defer { currentNode = currentNode?.down }
 			return currentNode?.value
 		}
 	}
 
 
-	__consuming func makeIterator() -> Iterator {
+	public __consuming func makeIterator() -> Iterator {
 		return Iterator(iteree: self)
 	}
 }
